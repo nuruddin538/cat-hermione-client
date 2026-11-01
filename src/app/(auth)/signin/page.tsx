@@ -21,11 +21,15 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (loading) return;
 
-    if (!email.trim() || !password) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
       toast.error("Please enter your email and password.");
       return;
     }
@@ -34,8 +38,9 @@ export default function SignInPage() {
 
     try {
       const result = await signIn.email({
-        email: email.trim(),
+        email,
         password,
+        callbackURL: "/",
       });
 
       if (result.error) {
@@ -54,6 +59,8 @@ export default function SignInPage() {
   }
 
   async function handleGoogleLogin() {
+    if (googleLoading) return;
+    setGoogleLoading(true);
     try {
       await signIn.social({
         provider: "google",
@@ -61,6 +68,8 @@ export default function SignInPage() {
       });
     } catch {
       toast.error("Google sign-in could not be started.");
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -139,6 +148,7 @@ export default function SignInPage() {
                   id="email"
                   type="email"
                   autoComplete="email"
+                  name="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -157,6 +167,7 @@ export default function SignInPage() {
                 <div className="relative">
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     required

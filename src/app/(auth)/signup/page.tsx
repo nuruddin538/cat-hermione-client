@@ -57,7 +57,11 @@ export default function SignUpPage() {
     }
 
     try {
-      new URL(photoURL);
+      const parsedPhotoURL = new URL(photoURL);
+      if (!["http:", "https:"].includes(parsedPhotoURL.protocol)) {
+        toast.error("Photo URL must use HTTP or HTTPS");
+        return;
+      }
     } catch {
       toast.error("Please enter a valid profile photo URL.");
       return;
