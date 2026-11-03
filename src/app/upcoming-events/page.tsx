@@ -1,3 +1,4 @@
+import EventCardSkeleton from "@/components/shared/EventCardSkeleton";
 import { CommunityEvent } from "@/types/event";
 import Link from "next/link";
 
@@ -46,9 +47,7 @@ export default async function UpcomingEventsPage() {
         </div>
         {events.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center dark:border-white/10 dark:bg-white/5">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              No upcoming events
-            </h2>
+            <EventCardSkeleton count={6} />
             <p className="mt-2 text-gray-600 dark:text-gray-300">
               Check back soon or create an event for your community.
             </p>
