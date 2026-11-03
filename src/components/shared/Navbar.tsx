@@ -24,11 +24,6 @@ const navLinks = [
 
 const profileLinks = [
   {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: UserRound,
-  },
-  {
     href: "/dashboard/create-event",
     label: "Create event",
     icon: CalendarDays,
