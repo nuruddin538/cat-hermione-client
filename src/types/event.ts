@@ -16,4 +16,11 @@ export interface CommunityEvent {
   eventDate: string;
   createdBy: string;
   createdAt: string;
+  joinedAt?: string;
+}
+
+export interface JoinedEventsResponse {
+  success: boolean;
+  message?: string;
+  events: CommunityEvent[];
 }
