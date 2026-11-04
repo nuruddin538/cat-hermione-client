@@ -47,7 +47,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-
   const user = session?.user;
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -60,14 +59,12 @@ export default function Navbar() {
         setProfileOpen(false);
       }
     }
-
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setMenuOpen(false);
         setProfileOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("keydown", handleEscape);
 
@@ -84,7 +81,6 @@ export default function Navbar() {
 
   async function handleLogout() {
     if (loggingOut) return;
-
     setLoggingOut(true);
 
     try {

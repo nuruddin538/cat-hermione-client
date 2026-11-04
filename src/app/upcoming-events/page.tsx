@@ -27,6 +27,7 @@ function formatDate(date: string | Date) {
     timeZone: "Asia/Dhaka",
   }).format(new Date(date));
 }
+
 export default async function UpcomingEventsPage() {
   const events = await getUpcomingEvents();
 

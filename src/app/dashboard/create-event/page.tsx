@@ -1,10 +1,11 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { router } from "better-auth/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const initialForm = {
@@ -15,6 +16,7 @@ const initialForm = {
   location: "",
   eventDate: "",
 };
+
 const eventTypes = [
   "Cleanup",
   "Plantation",
@@ -34,18 +36,11 @@ export default function CreateEventPage() {
   const router = useRouter();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [minDateTime, setMinDateTime] = useState(" ");
+  const [minDateTime, setMinDateTime] = useState(() => getLocalDateTimeMin());
 
-  // Set the minimum date after the component mounts.
-  // This avoids server/client date hydration mismatches.
-  useState(() => {
-    // No browser APIs are accessed during render.
-    setMinDateTime(getLocalDateTimeMin());
-  });
   const update = (field: keyof typeof initialForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
-
   // Refresh the date limit when the user starts interacting.
   function refreshMinDateTime() {
     setMinDateTime(getLocalDateTimeMin());
@@ -53,7 +48,6 @@ export default function CreateEventPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (loading) return;
-
     const { title, description, eventType, imageUrl, location, eventDate } =
       form;
 
@@ -65,15 +59,13 @@ export default function CreateEventPage() {
       !location.trim() ||
       !eventDate
     ) {
-      toast.error("Please complete all event fields.");
+      toast.error("Please complete all event fields");
       return;
     }
-
     if (new Date(eventDate).getTime() <= Date.now()) {
-      toast.error("Please select a future event date and time");
+      toast.error("Plese select a future event date and time");
       return;
     }
-
     try {
       setLoading(true);
       const { data: tokenData, error: tokenError } = await authClient.token();
@@ -84,7 +76,6 @@ export default function CreateEventPage() {
       }
       const apiUrl =
         process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
-
       const response = await fetch(`${apiUrl}/api/events`, {
         method: "POST",
         headers: {
@@ -106,14 +97,15 @@ export default function CreateEventPage() {
       }
       toast.success("Your event has been created successfully!");
       setForm(initialForm);
-      router.push("/events");
-      router.refresh();
+      // router.push("/events");
+      // router.refresh();
     } catch (error) {
       toast.error("Could not create the event. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <main className="min-h-screen bg-[#f8f7f1] px-4 py-12 dark:bg-[#101b17] sm:px-6 lg:py-16">
       <div className="mx-auto max-w-3xl">

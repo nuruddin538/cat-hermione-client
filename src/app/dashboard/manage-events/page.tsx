@@ -9,6 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 import { authClient, useSession } from "@/lib/auth-client";
 import type { CommunityEvent, EventType } from "@/types/event";
 
@@ -32,7 +33,6 @@ type EventForm = {
   location: string;
   eventDate: string;
 };
-
 type ApiResponse<T> = {
   success?: boolean;
   message?: string;
@@ -42,19 +42,15 @@ type ApiResponse<T> = {
 
 function toLocalDateTime(value: string): string {
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) {
     return "";
   }
-
   const offset = date.getTimezoneOffset() * 60_000;
-
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
 function formatEventDate(value: string): string {
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) {
     return "Invalid date";
   }
@@ -71,12 +67,11 @@ function formatEventDate(value: string): string {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Something went wrong.";
+  return error instanceof Error ? error.message : "Something went wrong";
 }
 
 export default function ManageEventsPage() {
   const { data: session, isPending } = useSession();
-
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -100,13 +95,11 @@ export default function ManageEventsPage() {
         "Your session could not be verified. Please sign in again."
       );
     }
-
     return data.token;
   }, []);
 
   const loadEvents = useCallback(async (): Promise<void> => {
     const token = await getToken();
-
     const response = await fetch(`${API_URL}/api/my-events`, {
       method: "GET",
       headers: {
@@ -115,29 +108,22 @@ export default function ManageEventsPage() {
       },
       cache: "no-store",
     });
-
     const result: ApiResponse<CommunityEvent> = await response.json();
-
     if (!response.ok || result.success === false) {
       throw new Error(result.message || "Failed to load events.");
     }
-
     setEvents(result.events ?? []);
   }, [getToken]);
 
   useEffect(() => {
     if (isPending) return;
-
     if (!session?.user) {
       window.location.href = "/signin";
       return;
     }
-
     let cancelled = false;
-
     async function fetchMyEvents(): Promise<void> {
       try {
-        setLoading(true);
         await loadEvents();
       } catch (error: unknown) {
         if (!cancelled) {
@@ -149,9 +135,7 @@ export default function ManageEventsPage() {
         }
       }
     }
-
     void fetchMyEvents();
-
     return () => {
       cancelled = true;
     };
@@ -161,7 +145,6 @@ export default function ManageEventsPage() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ): void {
     const { name, value } = e.target;
-
     setForm((current) => ({
       ...current,
       [name]: value,
@@ -204,12 +187,10 @@ export default function ManageEventsPage() {
       toast.error("Please select a valid future event date.");
       return;
     }
-
     if (!form.imageUrl.trim() || !form.location.trim()) {
       toast.error("Please complete all required fields.");
       return;
     }
-
     setSaving(true);
 
     try {
@@ -234,16 +215,12 @@ export default function ManageEventsPage() {
           }),
         }
       );
-
       const result: ApiResponse<CommunityEvent> = await response.json();
-
       if (!response.ok || result.success === false) {
         throw new Error(result.message || "Failed to update event.");
       }
-
       toast.success("Event updated successfully!");
       setEditingId(null);
-
       await loadEvents();
     } catch (error: unknown) {
       toast.error(getErrorMessage(error));
@@ -255,17 +232,25 @@ export default function ManageEventsPage() {
   async function handleDelete(id: string): Promise<void> {
     if (deletingId) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this event?"
-    );
-
-    if (!confirmed) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to recover this event!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#64748b",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      background: "#ffffff",
+      color: "#173f35",
+    });
+    if (!result.isConfirmed) return;
 
     setDeletingId(id);
 
     try {
       const token = await getToken();
-
       const response = await fetch(
         `${API_URL}/api/my-events/${encodeURIComponent(id)}`,
         {
@@ -276,22 +261,30 @@ export default function ManageEventsPage() {
           },
         }
       );
-
       const result: ApiResponse<CommunityEvent> = await response.json();
 
       if (!response.ok || result.success === false) {
         throw new Error(result.message || "Failed to delete event.");
       }
-
       setEvents((current) => current.filter((event) => event._id !== id));
 
       if (editingId === id) {
         cancelEditing();
       }
-
-      toast.success("Event deleted successfully!");
+      await Swal.fire({
+        title: "Deleted!",
+        text: "Your event has been deleted successfully.",
+        icon: "success",
+        confirmButtonColor: "#174d3b",
+        confirmButtonText: "OK",
+      });
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error));
+      Swal.fire({
+        title: "Error!",
+        text: getErrorMessage(error),
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+      });
     } finally {
       setDeletingId(null);
     }

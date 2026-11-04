@@ -1,10 +1,10 @@
 "use client";
 
 import { authClient, useSession } from "@/lib/auth-client";
-import type { CommunityEvent, JoinedEventsResponse } from "@/types/event";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type { JoinedEvent, JoinedEventsResponse } from "@/types/event";
 
 const API_URL =
   process.env.NEXT_PUBLIC_SERVER_BASE_URL || "http://localhost:5000";
@@ -32,7 +32,7 @@ function formatTimestamp(value?: string | Date): string {
 export default function JoinedEventsPage() {
   const { data: session, isPending } = useSession();
 
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
+  const [events, setEvents] = useState<JoinedEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -179,7 +179,7 @@ export default function JoinedEventsPage() {
                   </p>
 
                   <Link
-                    href={`/upcoming-events/${event._id}`}
+                    href={`/upcoming-events/${event.eventId}`}
                     className="mt-5 inline-block font-semibold text-emerald-800 hover:underline dark:text-emerald-300"
                   >
                     View Event →
