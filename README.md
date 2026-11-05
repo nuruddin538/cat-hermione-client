@@ -2,9 +2,19 @@
 
 Impactora is a community-driven platform that connects people through meaningful social development and volunteer activities. Users can discover upcoming events, join community initiatives, create their own events, and contribute to making a positive impact on society.
 
-## 🌐 Live Website
+## 🌐 Live Demo
 
-**Live Site:** [Visit Impactora](https://your-impactora-live-url.vercel.app)
+🔗 [Frontend Live Site](https://impactora-frontend.vercel.app/)
+🔗 [Backend Live Site](https://impactora-backend.vercel.app/)
+
+## 📂 Github Repository
+
+🔗[Frontend Github Repository](https://github.com/nuruddin538/cat-hermione-client)
+🔗[Backend Github Repository](https://github.com/nuruddin538/cat-hermione-server)
+
+<!-- Add your project screenshot here -->
+
+## ![DevStack Preview](https://i.ibb.co.com/m5RsbH4S/cat-hermione.png)
 
 > Replace the URL above with your actual deployed client-side URL.
 
