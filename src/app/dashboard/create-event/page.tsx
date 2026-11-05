@@ -1,11 +1,10 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { router } from "better-auth/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 const initialForm = {
@@ -74,8 +73,8 @@ export default function CreateEventPage() {
         router.push("/signin");
         return;
       }
-      const apiUrl =
-        process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+      const apiUrl = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
+      console.log(apiUrl);
       const response = await fetch(`${apiUrl}/api/events`, {
         method: "POST",
         headers: {
@@ -97,8 +96,8 @@ export default function CreateEventPage() {
       }
       toast.success("Your event has been created successfully!");
       setForm(initialForm);
-      // router.push("/events");
-      // router.refresh();
+      router.push("/upcoming-events");
+      router.refresh();
     } catch (error) {
       toast.error("Could not create the event. Please try again.");
     } finally {
@@ -130,7 +129,7 @@ export default function CreateEventPage() {
           </div>
           <form
             onSubmit={handleSubmit}
-            onFocus={refreshMinDateTime}
+            // onFocus={refreshMinDateTime}
             className="space-y-6 p-6 sm:p-10"
           >
             <div>
